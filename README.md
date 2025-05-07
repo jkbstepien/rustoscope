@@ -14,20 +14,28 @@ An in-depth paragraph about your project and overview of use.
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+* `pnpm`
+* `wasm-pack`
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
+* Clone this repo
+* Inside `/client` call `pnpm install`
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
+* Convert code to WebAssembly using `wasm-pack`
 ```
-code blocks for commands
+# Run inside /api dir
+wasm-pack build --target web --out-dir ../client/src/wasm
+```
+* How to run the program
+```
+pnpm run dev
+```
+* For gh-pages deployment
+```
+pnpm run deploy
 ```
 
 ## Authors
