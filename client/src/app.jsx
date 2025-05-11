@@ -1,19 +1,15 @@
-import { useState } from 'preact/hooks';
-import init, { update_button_text } from './wasm/wasm_api.js';
+import "./app.css";
+import ImageConverter from "./images/ImageConverter.jsx";
+import { useWasm } from "./useWasm.js";
 
 export function App() {
-  const [text, setText] = useState('Click me!');
-  
-  const handleClick = async () => {
-    await init();
-    const newText = update_button_text();
-    setText(newText);
-  };
+  const { wasmReady, wasmError } = useWasm();
+  console.log("WASM ready:", wasmReady);
 
   return (
     <div>
-      <div>Rust WASM project demo</div>
-      <button onClick={handleClick}>{text}</button>
+      {wasmError && <p>Error initializing WASM: {wasmError.message}</p>}
+      <ImageConverter />
     </div>
   );
 }
