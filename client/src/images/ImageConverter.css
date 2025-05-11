@@ -54,6 +54,27 @@
   cursor: not-allowed;
 }
 
+.conversion-select {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.conversion-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.conversion-select:hover {
+  border-color: #888;
+}
+
 .image-preview-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
