@@ -1,0 +1,64 @@
+name: build and deploy
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-path: ${{ steps.build.outputs.out_dir }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM (api → client/src/wasm)
+        id: build
+        working-directory: api
+        run: |
+          mkdir -p ../client/src/wasm
+          wasm-pack build \
+            --release \
+            --target web \
+            --out-dir ../client/src/wasm
+          echo "::set-output name=out_dir::$(pwd)/../client"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Copy site from root of repo
+        run: |
+          git rm -rf . || true
+          cp -r ${{ needs.build.outputs.artifact-path }}/* .
+
+      - name: Commit & push to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "Deploy site from main @ ${{ github.sha }}" || echo "No changes to commit"
+          git push origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
