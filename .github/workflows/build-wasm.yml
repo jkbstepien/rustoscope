@@ -18,7 +18,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          components: wasm-tools
+          targets: wasm32-unknown-unknown
 
       # 3. Install wasm-pack
       - name: Install wasm-pack
