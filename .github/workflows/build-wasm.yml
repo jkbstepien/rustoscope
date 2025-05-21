@@ -1,0 +1,38 @@
+name: Build WASM
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clone repository contents and checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install Rust
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: wasm-tools
+
+      # 3. Install wasm-pack
+      - name: Install wasm-pack
+        run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      # 4. Build crate into WebAssembly
+      - name: Build wasm-api crate
+        working-directory: api
+        run: |
+          wasm-pack build \
+            --target web \
+            --out-dir ../client/src/wasm
+
+      # 5. List the generated files
+      - name: List output
+        run: ls -lh client/src/wasm
