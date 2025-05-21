@@ -38,11 +38,22 @@ jobs:
             --out-dir ../client/src/wasm
           echo "::set-output name=out_dir::$(pwd)/../client"
 
+      - name: Setup Node.js (for client build)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Build client with Vite
+        working-directory: client
+        run: |
+          npm ci
+          npm run build
+
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./client
+          publish_dir: ./client/dist
           publish_branch: gh-pages
           force_orphan: true
   
