@@ -2,7 +2,7 @@ import "./ImageConverter.css";
 import { useState } from "preact/hooks";
 import Select from "react-select";
 import { useWasm } from "../useWasm.js";
-import { to_grayscale, invert_colors } from "../wasm/wasm_api.js";
+import { to_grayscale, invert_colors, to_png } from "../wasm/wasm_api.js";
 import ImagePreview from "./ImagePreview.jsx";
 
 const options = [
@@ -35,9 +35,13 @@ const ImageConverter = () => {
 
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
-    setRawBytes(bytes);
 
-    const blob = new Blob([bytes]);
+    // Transcode potential TIFF file as most browser can't display it raw.
+    const pngBytes = to_png(bytes);
+
+    setRawBytes(pngBytes);
+
+    const blob = new Blob([pngBytes]);
     setImgSrc(URL.createObjectURL(blob));
   };
 
