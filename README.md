@@ -8,7 +8,7 @@ WebAssembly image analysis, using Rust.
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+This project is currently under active development. You can view the latest version [here](https://jkbstepien.github.io/rustoscope/).
 
 ## Getting Started
 
