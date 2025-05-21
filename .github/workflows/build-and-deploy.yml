@@ -51,7 +51,7 @@ jobs:
       - name: Build client with Vite
         working-directory: client
         run: |
-          pnpm install --frozen-lockfile
+          pnpm install
           pnpm run build
 
       - name: Publish to GitHub Pages

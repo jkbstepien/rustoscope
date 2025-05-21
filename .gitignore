@@ -6,9 +6,6 @@
 /src/tmp
 /.pnp
 .pnp.js
-# This two probably should not be ignored
-pnpm-lock.yaml
-package-lock.json
 
 # testing
 /coverage
