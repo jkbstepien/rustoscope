@@ -10,7 +10,7 @@ const options = [
   { value: "invert", label: "Invert" },
 ];
 
-function convert(rawBytes, conversionType) {
+const convert = (rawBytes, conversionType) => {
   switch (conversionType) {
     case "grayscale":
       return to_grayscale(rawBytes);
@@ -18,6 +18,19 @@ function convert(rawBytes, conversionType) {
       return invert_colors(rawBytes);
     default:
       throw new Error("Unsupported conversion type");
+  }
+}
+
+const processBytes = (fileType, bytes) => {
+  switch (fileType) {
+    case "image/png":
+      return bytes;
+    case "image/jpg":
+      return bytes;
+    case "image/tiff":
+      return to_png(bytes);
+    default:
+      throw new Error("Unsupported image type. Supported: [png, jpg, tiff]");
   }
 }
 
@@ -29,6 +42,7 @@ const ImageConverter = () => {
   const [rawBytes, setRawBytes] = useState(null);
   const [previesAspectRatios, setPreviesAspectRatios] = useState(16 / 10);
   const [conversionType, setConversionType] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const handleUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -37,17 +51,24 @@ const ImageConverter = () => {
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
 
-    // Transcode potential TIFF file as most browser can't display it raw.
-    const processedBytes = file.type === "image/tiff" ? to_png(bytes) : bytes;
+    setErrorMessage(null);
 
-    setRawBytes(processedBytes);
-
-    const blob = new Blob([processedBytes]);
-    setImgSrc(URL.createObjectURL(blob));
+    try {
+      const processedBytes = processBytes(file.type, bytes);
+      setRawBytes(processedBytes);
+      const blob = new Blob([processedBytes]);
+      setImgSrc(URL.createObjectURL(blob));
+    } catch (err) {
+      console.error(`Upload error: ${err}`)
+      setErrorMessage(`Upload error: ${err}`)
+      setImgSrc(null);
+      setRawBytes(null);
+    }
   };
 
   const handleConvert = async () => {
     if (!rawBytes || !wasmReady) return;
+
     const output = convert(rawBytes, conversionType.value);
     const blob = new Blob([output], { type: "image/png" });
     setImgResult(URL.createObjectURL(blob));
@@ -102,6 +123,7 @@ const ImageConverter = () => {
           aspectRatio={previesAspectRatios}
           setAspectRatio={setPreviesAspectRatios}
           emptyText={"No image selected"}
+          error={errorMessage}
         />
         <ImagePreview
           imageUrl={imgResult}
