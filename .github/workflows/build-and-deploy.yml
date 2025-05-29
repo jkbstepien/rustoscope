@@ -1,0 +1,77 @@
+name: build and deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-path: ${{ steps.build.outputs.out_dir }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM (api → client/src/wasm)
+        id: build
+        working-directory: api
+        run: |
+          mkdir -p ../client/src/wasm
+          wasm-pack build \
+            --release \
+            --target web \
+            --out-dir ../client/src/wasm
+          echo "out_dir=$(pwd)/../client" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js (for client build)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
+
+      - name: Build client with Vite
+        working-directory: client
+        run: |
+          pnpm install
+          pnpm run build
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
