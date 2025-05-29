@@ -19,9 +19,6 @@ Session.vim
 .vs/
 .dir-locals.el
 
-# Node
-/node_modules
-
 ## Tool
 .cargo
 
