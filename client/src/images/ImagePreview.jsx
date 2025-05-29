@@ -7,6 +7,7 @@ const ImagePreview = ({
   emptyText,
   aspectRatio,
   setAspectRatio,
+  error = null
 }) => {
   const imgRef = useRef(null);
 
@@ -42,6 +43,7 @@ const ImagePreview = ({
           <p>{emptyText || "No image available"}</p>
         </div>
       )}
+      {error && <span className='error-message'>{error}</span>}
     </div>
   );
 };

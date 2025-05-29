@@ -27,3 +27,8 @@
   border: 2px dashed #ddd;
   background-color: #f9f9f9;
 }
+
+.error-message {
+  margin-top: 20px;
+  color: red;
+}
