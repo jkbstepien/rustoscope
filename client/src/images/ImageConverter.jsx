@@ -23,6 +23,7 @@ function convert(rawBytes, conversionType) {
 
 const ImageConverter = () => {
   const { wasmReady } = useWasm();
+
   const [imgSrc, setImgSrc] = useState(null);
   const [imgResult, setImgResult] = useState(null);
   const [rawBytes, setRawBytes] = useState(null);
@@ -37,11 +38,11 @@ const ImageConverter = () => {
     const bytes = new Uint8Array(arrayBuffer);
 
     // Transcode potential TIFF file as most browser can't display it raw.
-    const pngBytes = to_png(bytes);
+    const processedBytes = file.type === "image/tiff" ? to_png(bytes) : bytes;
 
-    setRawBytes(pngBytes);
+    setRawBytes(processedBytes);
 
-    const blob = new Blob([pngBytes]);
+    const blob = new Blob([processedBytes]);
     setImgSrc(URL.createObjectURL(blob));
   };
 
