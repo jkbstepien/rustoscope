@@ -1,28 +1,29 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-/api/target
-
-# dependencies
-/node_modules
-/src/tmp
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-*.snap
-/cypress/videos
-/cypress/screenshots
-/pact
-/test-results
-
-# production
-/build**
-
-# misc
+## File system
 .DS_Store
+desktop.ini
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+## Editor
+*.swp
+*.swo
+Session.vim
+.cproject
 .idea
+*.iml
 .vscode
+.project
+.vim/
+.helix/
+.zed/
+.favorites.json
+.settings/
+.vs/
+.dir-locals.el
+
+# Node
+/node_modules
+
+## Tool
+.cargo
+
+## Build
+/api/target
