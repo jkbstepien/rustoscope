@@ -54,6 +54,11 @@ jobs:
           pnpm install
           pnpm run build
 
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
