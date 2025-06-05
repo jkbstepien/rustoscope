@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import init from "./wasm/wasm_api.js";
+import init from "../wasm/wasm_api.js";
 
 export function useWasm() {
   const [wasmReady, setWasmReady] = useState(false);
