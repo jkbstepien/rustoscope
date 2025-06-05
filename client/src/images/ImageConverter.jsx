@@ -134,7 +134,7 @@ const ImageConverter = () => {
             />
             Remove hot-pixels
           </label>
-          <label htmlFor="percentile-input" style={{ marginRight: '8px' }}>
+          <label htmlFor="percentile-input" style={{ marginRight: '8px' }} className='text-red-500'>
             Percentile:
           </label>
           <input
