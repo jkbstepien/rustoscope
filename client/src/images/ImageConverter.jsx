@@ -2,7 +2,7 @@ import "./ImageConverter.css";
 import { useState } from "preact/hooks";
 import Select from "react-select";
 import { useWasm } from "../useWasm.js";
-import { to_grayscale, invert_colors, to_png } from "../wasm/wasm_api.js";
+import { to_grayscale, invert_colors, to_png, remove_hot_pixels_with_percentile } from "../wasm/wasm_api.js";
 import ImagePreview from "./ImagePreview.jsx";
 
 const options = [
@@ -43,6 +43,8 @@ const ImageConverter = () => {
   const [previesAspectRatios, setPreviesAspectRatios] = useState(16 / 10);
   const [conversionType, setConversionType] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [percentile, setPercentile] = useState(95);
+  const [removeHotPixels, setRemoveHotPixels] = useState(false);
 
   const handleUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -69,9 +71,29 @@ const ImageConverter = () => {
   const handleConvert = async () => {
     if (!rawBytes || !wasmReady) return;
 
-    const output = convert(rawBytes, conversionType.value);
-    const blob = new Blob([output], { type: "image/png" });
-    setImgResult(URL.createObjectURL(blob));
+    try {
+      const convertedBytes = convert(rawBytes, conversionType.value);
+
+      let finalBytes = convertedBytes;
+      if (removeHotPixels) {
+        try {
+          finalBytes = remove_hot_pixels_with_percentile(
+            convertedBytes,
+            percentile
+          );
+        } catch (hpErr) {
+          console.error(`Hot-pixel removal error: ${hpErr}`);
+          setErrorMessage(`Hot-pixel removal error: ${hpErr}`);
+          finalBytes = convertedBytes;
+        }
+      }
+
+      const blob = new Blob([finalBytes], { type: "image/png" });
+      setImgResult(URL.createObjectURL(blob));
+    } catch (convErr) {
+      console.error(`Conversion error: ${convErr}`);
+      setErrorMessage(`Conversion error: ${convErr}`);
+    }
   };
 
   return (
@@ -100,6 +122,39 @@ const ImageConverter = () => {
                 backgroundColor: isFocused ? "#f0f0f0" : "white",
                 color: "#333",
               }),
+            }}
+          />
+          <label htmlFor='hotpixels-checkbox' style={{ marginRight: '4px' }}>
+            <input
+              id='hotpixels-checkbox'
+              type='checkbox'
+              checked={removeHotPixels}
+              onInput={(e) => setRemoveHotPixels(e.currentTarget.checked)}
+              style={{ marginRight: '4px' }}
+            />
+            Remove hot-pixels
+          </label>
+          <label htmlFor="percentile-input" style={{ marginRight: '8px' }}>
+            Percentile:
+          </label>
+          <input
+            id="percentile-input"
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value={percentile}
+            onInput={(e) => {
+              const val = e.currentTarget.valueAsNumber;
+              if (!Number.isNaN(val) && val >= 0 && val <= 100) {
+                setPercentile(val);
+              }
+            }}
+            style={{
+              width: '80px',
+              borderRadius: '6px',
+              borderColor: '#ccc',
+              padding: '4px',
             }}
           />
           <button
