@@ -29,15 +29,16 @@ pub fn clip_pixels_with_percentiles(
     high_percentile: Option<f32>,
 ) -> Result<Vec<u8>, JsValue> {
     if let Some(lp) = low_percentile {
-        if !(0.0..=100.0).contains(&lp) {
-            return Err(JsValue::from_str("low_percentile must be between 0 and 100"));
+        if lp < 0.0 || lp > 100.0 {
+            return Err(JsValue::from_str("Percentile must be between 0 and 100"));
         }
     }
     if let Some(hp) = high_percentile {
-        if !(0.0..=100.0).contains(&hp) {
-            return Err(JsValue::from_str("high_percentile must be between 0 and 100"));
+        if hp < 0.0 || hp > 100.0 {
+            return Err(JsValue::from_str("Percentile must be between 0 and 100"));
         }
     }
+
     if let (Some(lp), Some(hp)) = (low_percentile, high_percentile) {
         if lp > hp {
             return Err(JsValue::from_str("low_percentile must be <= high_percentile"));
