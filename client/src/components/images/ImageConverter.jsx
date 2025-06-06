@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import Select from "react-select";
 import { useWasm } from "@/hooks/useWasm.ts";
-import { to_grayscale, invert_colors, to_png, remove_hot_pixels_with_percentile } from "@/wasm/wasm_api.js";
+import { to_grayscale, invert_colors, to_png, clip_pixels_with_percentiles } from "@/wasm/wasm_api.js";
 import ImagePreview from "./ImagePreview.jsx";
 
 const options = [
@@ -42,7 +42,8 @@ const ImageConverter = () => {
   const [previesAspectRatios, setPreviesAspectRatios] = useState(16 / 10);
   const [conversionType, setConversionType] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [percentile, setPercentile] = useState(95);
+  const [lowPercentile, setLowPercentile] = useState(5);
+  const [highPercentile, setHighPercentile] = useState(95);
   const [removeHotPixels, setRemoveHotPixels] = useState(false);
 
   const handleUpload = async (e) => {
@@ -78,9 +79,10 @@ const ImageConverter = () => {
       let finalBytes = convertedBytes;
       if (removeHotPixels) {
         try {
-          finalBytes = remove_hot_pixels_with_percentile(
-            convertedBytes,
-            percentile
+          finalBytes = clip_pixels_with_percentiles(
+              convertedBytes,
+              lowPercentile,
+              highPercentile
           );
         } catch (hpErr) {
           console.error(`Hot-pixel removal error: ${hpErr}`);
@@ -171,7 +173,7 @@ const ImageConverter = () => {
             </label>
             <div className="flex items-center justify-start w-full">
               <label htmlFor="percentile-input" className='text-gray-700 text-sm font-medium mr-2 py-4'>
-                Percentile:
+                Percentile low:
               </label>
               <input
                   id="percentile-input"
@@ -179,11 +181,31 @@ const ImageConverter = () => {
                   min="0"
                   max="100"
                   step="1"
-                  value={percentile}
+                  value={lowPercentile}
                   onInput={(e) => {
                     const val = e.currentTarget.valueAsNumber;
                     if (!Number.isNaN(val) && val >= 0 && val <= 100) {
-                      setPercentile(val);
+                      setLowPercentile(val);
+                    }
+                  }}
+                  className='w-24 px-3 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm'
+              />
+            </div>
+            <div className="flex items-center justify-start w-full">
+              <label htmlFor="percentile-input" className='text-gray-700 text-sm font-medium mr-2 py-4'>
+                Percentile high:
+              </label>
+              <input
+                  id="percentile-input"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={highPercentile}
+                  onInput={(e) => {
+                    const val = e.currentTarget.valueAsNumber;
+                    if (!Number.isNaN(val) && val >= 0 && val <= 100) {
+                      setHighPercentile(val);
                     }
                   }}
                   className='w-24 px-3 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm'
