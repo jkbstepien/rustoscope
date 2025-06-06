@@ -172,11 +172,11 @@ const ImageConverter = () => {
               Remove hot-pixels
             </label>
             <div className="flex items-center justify-start w-full">
-              <label htmlFor="percentile-input" className='text-gray-700 text-sm font-medium mr-2 py-4'>
+              <label htmlFor="percentile-low-input" className='text-gray-700 text-sm font-medium mr-2 py-4'>
                 Percentile low:
               </label>
               <input
-                  id="percentile-input"
+                  id="percentile-low-input"
                   type="number"
                   min="0"
                   max="100"
