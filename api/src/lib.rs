@@ -27,6 +27,9 @@ pub fn remove_hot_pixels_with_percentile(
     image_data: &[u8],
     percentile: f32,
 ) -> Result<Vec<u8>, JsValue> {
+    if percentile < 0.0 || percentile > 100.0 {
+        return Err(JsValue::from_str("Percentile must be between 0 and 100"));
+    }
     let img = image::load_from_memory(image_data)
         .map_err(|e| JsValue::from_str(&format!("Image decode error: {}", e)))?;
 
@@ -38,20 +41,14 @@ pub fn remove_hot_pixels_with_percentile(
     if total == 0 {
         return Err(JsValue::from_str("Empty image buffer"));
     }
-    if !(0.0..=100.0).contains(&percentile) {
-        return Err(JsValue::from_str("Percentile must be between 0 and 100"));
-    }
+
     let mut flat = pixels.clone();
     let idx = ((percentile / 100.0) * (total as f32)).floor() as usize;
     let idx = if idx >= total { total - 1 } else { idx };
     flat.select_nth_unstable(idx);
     let cutoff = flat[idx];
 
-    for v in pixels.iter_mut() {
-        if *v > cutoff {
-            *v = cutoff;
-        }
-    }
+    pixels.iter_mut().for_each(|v| *v = (*v).min(cutoff));
 
     let clamped_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =
         ImageBuffer::from_raw(width, height, pixels)
