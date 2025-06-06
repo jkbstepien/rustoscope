@@ -50,10 +50,10 @@ pub fn remove_hot_pixels_with_percentile(
 
     pixels.iter_mut().for_each(|v| *v = (*v).min(cutoff));
 
-    let clamped_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =
+    let clip_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =
         ImageBuffer::from_raw(width, height, pixels)
             .ok_or_else(|| JsValue::from_str("Buffer length mismatch"))?;
-    let dyn_img = DynamicImage::ImageRgb8(clamped_buf);
+    let dyn_img = DynamicImage::ImageRgb8(clip_buf);
 
     let mut output = Cursor::new(Vec::new());
     dyn_img
