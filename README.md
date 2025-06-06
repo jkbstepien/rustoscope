@@ -6,35 +6,61 @@
 
 WebAssembly image analysis, using Rust.
 
-## Description
+## 🌐 Live Demo
 
-This project is currently under active development. You can view the latest version [here](https://jkbstepien.github.io/rustoscope/).
+You can view the latest deployed version here:  
+🔗 [https://jkbstepien.github.io/rustoscope/](https://jkbstepien.github.io/rustoscope/)
 
-## Getting Started
+## 📦 Getting Started
 
-### Dependencies
+### ✅ Prerequisites
 
-* `pnpm`
-* `wasm-pack`
+Make sure the following tools are installed:
 
-### Installing
+- [`pnpm`](https://pnpm.io/)
+- [`wasm-pack`](https://rustwasm.github.io/wasm-pack/)
 
-* Clone this repo
-* Inside `/client` call `pnpm install`
+> 💡 Additionally, ensure Rust and `cargo` are installed. If not, install them with:  
+> `curl https://sh.rustup.rs -sSf | sh`
 
-### Executing program
+### 🛠️ Installation
 
-* Convert code to WebAssembly using `wasm-pack`
-```
-# Run inside /api dir
-wasm-pack build --target web --out-dir ../client/src/wasm
-```
-* How to run the program
-```
-pnpm run dev
-```
-* For gh-pages deployment
-```
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/rustoscope.git
+   cd rustoscope
+   ```
+
+2. Install frontend dependencies:
+
+   ```bash
+    cd client
+    pnpm install
+   ```
+
+### 🚀 Running the Project
+
+1. Build WebAssembly from Rust source:
+
+  ```bash
+    # Run this inside the /api directory
+    cd api
+    wasm-pack build --target web --out-dir ../client/src/wasm
+  ```
+
+2. Start the development server:
+
+  ```bash
+    cd client
+    pnpm run dev
+  ```
+
+### 🚢 Deployment (GitHub Pages)
+
+To deploy the application:
+
+```bash
 pnpm run deploy
 ```
 
@@ -43,5 +69,7 @@ pnpm run deploy
 Contributors:
 
 1. [Jakub Stępień](https://github.com/jkbstepien)
-2. [Kacper Cienkosz]()
-3. [Adam Mytnik]()
+2. [Kacper Cienkosz](https://github.com/kacienk)
+3. [Adam Mytnik](https://github.com/AdamMytnik)
+
+This project was created as a part of Large Scale Computing course at AGH University of Science and Technology in Kraków, Poland under the supervision of [PhD. Leszek Grzanka](https://github.com/grzanka).
