@@ -1,8 +1,7 @@
-import "./ImageConverter.css";
 import { useState } from "preact/hooks";
 import Select from "react-select";
-import { useWasm } from "../../hooks/useWasm.ts";
-import { to_grayscale, invert_colors, to_png, remove_hot_pixels_with_percentile } from "../../wasm/wasm_api.js";
+import { useWasm } from "@/hooks/useWasm.ts";
+import { to_grayscale, invert_colors, to_png, remove_hot_pixels_with_percentile } from "@/wasm/wasm_api.ts";
 import ImagePreview from "./ImagePreview.jsx";
 
 const options = [

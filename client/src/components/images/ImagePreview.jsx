@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "preact/hooks";
-import "./ImagePreview.css";
 
 const ImagePreview = ({
   imageUrl,
