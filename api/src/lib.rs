@@ -38,6 +38,11 @@ pub fn clip_pixels_with_percentiles(
             return Err(JsValue::from_str("high_percentile must be between 0 and 100"));
         }
     }
+    if let (Some(lp), Some(hp)) = (low_percentile, high_percentile) {
+        if lp > hp {
+            return Err(JsValue::from_str("low_percentile must be <= high_percentile"));
+        }
+    }
 
     let img = image::load_from_memory(image_data)
         .map_err(|e| JsValue::from_str(&format!("Image decode error: {}", e)))?;
