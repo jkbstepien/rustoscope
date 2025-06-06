@@ -1,4 +1,3 @@
-import "./app.css";
 import ImageConverter from "@/components/images/ImageConverter.jsx";
 import { useWasm } from "./hooks/useWasm.js";
 
