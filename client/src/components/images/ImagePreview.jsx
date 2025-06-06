@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "preact/hooks";
-import "./ImagePreview.css";
 
 const ImagePreview = ({
   imageUrl,
@@ -34,16 +33,16 @@ const ImagePreview = ({
   };
 
   return (
-    <div className='image-preview'>
-      {header && <h2>{header}</h2>}
+    <div className='w-full flex flex-col items-center justify-center p-2'>
+      {header && <div className='text-xl font-bold p-2'>{header}</div>}
       {imageUrl ? (
-        <img ref={imgRef} src={imageUrl} alt='Preview' style={previewStyle} />
+        <img ref={imgRef} src={imageUrl} alt='Preview' style={previewStyle} className='w-full object-contain rounded-md bg-gray-50 shadow-md' />
       ) : (
-        <div className='empty-preview' style={previewStyle}>
-          <p>{emptyText || "No image available"}</p>
+        <div className='w-full flex justify-center items-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 shadow-sm' style={previewStyle}>
+          <p className='text-gray-600'>{emptyText || "No image available"}</p>
         </div>
       )}
-      {error && <span className='error-message'>{error}</span>}
+      {error && <span className='mt-5 text-red-600'>{error}</span>}
     </div>
   );
 };

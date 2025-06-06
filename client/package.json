@@ -8,15 +8,27 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && gh-pages -d dist"
+    "typecheck": "tsc --noEmit",
+    "deploy": "vite build && gh-pages -d dist",
+    "build-css": "npx @tailwindcss/cli -i ./src/index.css -o ./public/output.css",
+    "build-css-watch": "npx @tailwindcss/cli -i ./src/index.css -o ./public/output.css --watch"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.8",
     "preact": "^10.26.5",
     "react-select": "^5.10.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "autoprefixer": "^10.4.21",
     "gh-pages": "^6.3.0",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3",
     "vite": "^6.3.5",
     "wasm-pack": "^0.13.1"
   }
