@@ -22,6 +22,22 @@ Make sure the following tools are installed:
 
 > 💡 Additionally, ensure Rust and `cargo` are installed. If not, install them with:  
 > `curl https://sh.rustup.rs -sSf | sh`
+>
+> **Note:** We recommend instatllation via [rustup](https://rustup.rs/) instead of using your system package manager, as we encountered issues with the `wasm-pack` package in some distributions.
+> We tested the project using `1.86.0` version of Rust, thus we recommend using this version or later.
+
+## 📖 Project Structure
+
+The project is structured as follows:
+
+```
+rustoscope/
+├── api/                # Rust backend for WebAssembly
+├── client/             # Frontend application
+├── .github/            # GitHub Actions workflows
+├── .gitignore          # Git ignore file
+└── README.md           # This file
+```
 
 ### 🛠️ Installation
 
@@ -29,36 +45,31 @@ Make sure the following tools are installed:
 
    ```bash
    git clone https://github.com/your-username/rustoscope.git
-   cd rustoscope
    ```
 
-2. Install frontend dependencies:
+2. Install frontend dependencies (inside the `client/` directory):
 
    ```bash
-    cd client
     pnpm install
    ```
 
 ### 🚀 Running the Project
 
-1. Build WebAssembly from Rust source:
+1. Build WebAssembly from Rust source code (inside the `api/` directory):
 
   ```bash
-    # Run this inside the /api directory
-    cd api
     wasm-pack build --target web --out-dir ../client/src/wasm
   ```
 
-2. Start the development server:
+2. Start the development server (inside the `client/` directory):
 
   ```bash
-    cd client
     pnpm run dev
   ```
 
 ### 🚢 Deployment (GitHub Pages)
 
-To deploy the application:
+To deploy the application (inside the `client/` directory):
 
 ```bash
 pnpm run deploy
