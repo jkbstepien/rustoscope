@@ -1,0 +1,7 @@
+{
+  "trailingComma": "es5",
+  "semi": true,
+  "jsxSingleQuote": false,
+  "singleQuote": true,
+  "arrowParens": "always"
+}
