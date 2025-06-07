@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   ConversionAlgorithmType,
   ConversionAlgorithm,
@@ -85,13 +85,32 @@ const AlgorithmsContainer = ({
     );
   };
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    const enabledAlgorithms = algorithms.filter((a) => a.enabled);
-  };
+  const moveAlgorithmUp = useCallback(
+    (idx: number) => {
+      if (idx === 0) return;
+      setAlgorithms((prev) => {
+        const arr = [...prev];
+        [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
+        return arr;
+      });
+    },
+    [setAlgorithms]
+  );
+
+  const moveAlgorithmDown = useCallback(
+    (idx: number) => {
+      if (idx === algorithms.length - 1) return;
+      setAlgorithms((prev) => {
+        const arr = [...prev];
+        [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
+        return arr;
+      });
+    },
+    [setAlgorithms, algorithms.length]
+  );
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+    <form className="flex flex-col gap-2">
       {algorithms.length === 0 && (
         <div className="text-gray-500 flex w-full justify-center">
           <span className="italic">No algorithms added yet.</span>
@@ -105,14 +124,17 @@ const AlgorithmsContainer = ({
           setEnabled={(i, enabled) => updateAlgorithm(i, { enabled: enabled })}
           removeAlgorithm={removeAlgorithm}
           updateAlgorithm={updateAlgorithm}
+          moveUp={moveAlgorithmUp}
+          moveDown={moveAlgorithmDown}
+          isFirst={idx === 0}
+          isLast={idx === algorithms.length - 1}
         />
       ))}
 
-      {/* Add algorithm section with hover menu */}
       <div className="relative flex items-center gap-2">
         <button
           type="button"
-          className="px-3 pt-1 bg-blue-500 text-white rounded text-lg w-full"
+          className="px-3 py-1 bg-blue-500 text-white rounded text-lg w-full"
           onClick={() => setMenuOpen((v) => !v)}
           title="Add algorithm"
         >

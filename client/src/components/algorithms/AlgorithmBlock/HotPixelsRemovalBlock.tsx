@@ -11,6 +11,10 @@ type AlgorithmBlockProps = {
     updates: Partial<ConversionAlgorithm>
   ) => void;
   removeAlgorithm: (index: number) => void;
+  moveUp: (idx: number) => void;
+  moveDown: (idx: number) => void;
+  isFirst: boolean;
+  isLast: boolean;
 };
 
 const HotPixelsRemovalBlock = ({
@@ -19,6 +23,10 @@ const HotPixelsRemovalBlock = ({
   setEnabled,
   removeAlgorithm,
   updateAlgorithm,
+  moveUp,
+  moveDown,
+  isFirst,
+  isLast,
 }: AlgorithmBlockProps) => {
   return (
     <div
@@ -30,6 +38,10 @@ const HotPixelsRemovalBlock = ({
         algorithm={algorithm}
         setEnabled={setEnabled}
         removeAlgorithm={removeAlgorithm}
+        moveUp={moveUp}
+        moveDown={moveDown}
+        isFirst={isFirst}
+        isLast={isLast}
       />
       <div className="flex gap-4 mt-2">
         <label>

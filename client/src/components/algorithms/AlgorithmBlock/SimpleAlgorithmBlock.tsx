@@ -1,20 +1,18 @@
 import React from 'react';
 import { ConversionAlgorithm } from '@/models/algorithms';
 import AlgorithmBlockHeader from './AlgorithmBlockHeader';
-
-type SimpleAlgorithmBlockProps = {
-  idx: number;
-  algorithm: ConversionAlgorithm;
-  setEnabled: (idx: number, enabled: boolean) => void;
-  removeAlgorithm: (index: number) => void;
-};
+import { AlgorithmBlockProps } from '.';
 
 const SimpleAlgorithmBlock = ({
   idx,
   algorithm,
   setEnabled,
   removeAlgorithm,
-}: SimpleAlgorithmBlockProps) => {
+  moveUp,
+  moveDown,
+  isFirst,
+  isLast,
+}: Omit<AlgorithmBlockProps, 'updateAlgorithm'>) => {
   return (
     <div
       key={idx}
@@ -25,6 +23,10 @@ const SimpleAlgorithmBlock = ({
         algorithm={algorithm}
         setEnabled={setEnabled}
         removeAlgorithm={removeAlgorithm}
+        moveUp={moveUp}
+        moveDown={moveDown}
+        isFirst={isFirst}
+        isLast={isLast}
       />
     </div>
   );
