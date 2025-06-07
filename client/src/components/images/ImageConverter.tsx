@@ -1,12 +1,13 @@
 import { useState } from 'preact/hooks';
-import Select from 'react-select';
 import { useWasm } from '@/hooks/useWasm';
 import {
   to_grayscale,
   invert_colors,
   to_png,
   clip_pixels_with_percentiles,
-} from '@/wasm/wasm_api.js';
+  gaussian_blur,
+  median_blur,
+} from '@/wasm';
 import ImagePreview from './ImagePreview.jsx';
 import AlgorithmsContainer from '@/components/algorithms/AlgorithmsContainer';
 import {
@@ -31,6 +32,10 @@ const convert = (
         algorithm.lowPercentile,
         algorithm.highPercentile
       );
+    case ConversionAlgorithmType.GaussianBlur:
+      return gaussian_blur(bytesToProcess, algorithm.sigma);
+    case ConversionAlgorithmType.MedianBlur:
+      return median_blur(bytesToProcess, algorithm.kernelRadius);
     default:
       setErrorMessage(`Unsupported algorithm: ${algorithm}`);
       return;
@@ -76,7 +81,6 @@ const ImageConverter = () => {
       const blob = new Blob([processedBytes]);
       setImgSrc(URL.createObjectURL(blob));
     } catch (err) {
-      console.error(`Upload error: ${err}`);
       setErrorMessage(`Upload error: ${err}`);
       setImgSrc(null);
       setRawBytes(null);

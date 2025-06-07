@@ -64,6 +64,20 @@ const AlgorithmsContainer = ({
                   ? (updated as HotPixelRemoval).highPercentile
                   : alg.highPercentile,
             };
+          case ConversionAlgorithmType.GaussianBlur:
+            return {
+              ...alg,
+              enabled: updated.enabled ?? alg.enabled,
+              sigma: (updated as { sigma?: number }).sigma ?? alg.sigma,
+            };
+          case ConversionAlgorithmType.MedianBlur:
+            return {
+              ...alg,
+              enabled: updated.enabled ?? alg.enabled,
+              kernelRadius:
+                (updated as { kernelRadius?: number }).kernelRadius ??
+                alg.kernelRadius,
+            };
           default:
             return alg;
         }
@@ -74,7 +88,6 @@ const AlgorithmsContainer = ({
   const handleSubmit = (e: any) => {
     e.preventDefault();
     const enabledAlgorithms = algorithms.filter((a) => a.enabled);
-    console.log('Submitted algorithms:', enabledAlgorithms);
   };
 
   return (
