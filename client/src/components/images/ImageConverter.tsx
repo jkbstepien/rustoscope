@@ -136,118 +136,11 @@ const ImageConverter = () => {
             setAspectRatio={setPreviewsAspectRatios}
             emptyText={
               imgSrc
-                ? "Select conversion type and press 'Convert'"
+                ? "Select conversion type and press 'Run'"
                 : 'No image selected'
             }
           />
         </div>
-        {/* <div className="w-1/5 flex flex-col items-center justify-start bg-white rounded-md m-2">
-        <div className="py-4 text-xl font-bold">Options</div>
-        <div className="w-full h-full flex flex-col items-start justify-start mt-2 px-2">
-          <div className="w-full flex flex-col items-center justify-center">
-            <label
-              htmlFor="image-upload"
-              className="cursor-pointer text-center px-4 py-2 bg-orange-500 text-white rounded-md mb-4 w-[150px]"
-            >
-              Upload image
-            </label>
-            <input
-              id="image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleUpload}
-              className="hidden"
-            />
-            <button
-              onClick={handleConvert}
-              disabled={!wasmReady || !rawBytes || !conversionType}
-              className={`
-                  cursor-pointer text-center px-4 py-2 bg-orange-700 text-white rounded-md mb-4 w-[150px]
-                  ${
-                    !wasmReady || !rawBytes || !conversionType
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''
-                  }
-                `}
-            >
-              Convert
-            </button>
-          </div>
-          <label
-            htmlFor="conversion-select"
-            className="block text-gray-700 text-sm font-medium mb-1 mt-4"
-          >
-            Conversion Type:
-          </label>
-          <Select
-            id="conversion-select"
-            value={conversionType}
-            onChange={(opt) => setConversionType(opt)}
-            options={options}
-            className="w-full"
-            classNamePrefix="react-select"
-          />
-          <label
-            htmlFor="hotpixels-checkbox"
-            className="flex items-center cursor-pointer text-gray-700 text-sm font-medium w-full mt-4"
-          >
-            <input
-              id="hotpixels-checkbox"
-              type="checkbox"
-              checked={removeHotPixels}
-              onInput={(e) => setRemoveHotPixels(e.currentTarget.checked)}
-              className="form-checkbox h-4 w-4 text-blue-600 rounded mr-2 focus:ring-blue-500"
-            />
-            Remove hot-pixels
-          </label>
-          <div className="flex items-center justify-start w-full">
-            <label
-              htmlFor="percentile-low-input"
-              className="text-gray-700 text-sm font-medium mr-2 py-4"
-            >
-              Percentile low:
-            </label>
-            <input
-              id="percentile-low-input"
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              value={lowPercentile}
-              onInput={(e) => {
-                const val = e.currentTarget.valueAsNumber;
-                if (!Number.isNaN(val) && val >= 0 && val <= 100) {
-                  setLowPercentile(val);
-                }
-              }}
-              className="w-24 px-3 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-            />
-          </div>
-          <div className="flex items-center justify-start w-full">
-            <label
-              htmlFor="percentile-input"
-              className="text-gray-700 text-sm font-medium mr-2 py-4"
-            >
-              Percentile high:
-            </label>
-            <input
-              id="percentile-input"
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              value={highPercentile}
-              onInput={(e) => {
-                const val = e.currentTarget.valueAsNumber;
-                if (!Number.isNaN(val) && val >= 0 && val <= 100) {
-                  setHighPercentile(val);
-                }
-              }}
-              className="w-24 px-3 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-            />
-          </div>
-        </div>
-      </div> */}
       </div>
       <div className="w-1/4 flex-col h-full bg-gray-50 mt-2 ml-1 rounded-md p-3 shadow-md">
         <div className="flex justify-evenly space-around w-full mb-4">
