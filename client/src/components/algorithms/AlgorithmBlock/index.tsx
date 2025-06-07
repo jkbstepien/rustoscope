@@ -8,7 +8,7 @@ import HotPixelsRemovalBlock from './HotPixelsRemovalBlock';
 import GaussianBlurBlock from './GaussianBlurBlock';
 import MedianBlurBlock from './MedianBlurBlock';
 
-type AlgorithmBlockProps = {
+export type AlgorithmBlockProps = {
   idx: number;
   algorithm: ConversionAlgorithm;
   setEnabled: (idx: number, enabled: boolean) => void;
@@ -17,6 +17,10 @@ type AlgorithmBlockProps = {
     updates: Partial<ConversionAlgorithm>
   ) => void;
   removeAlgorithm: (index: number) => void;
+  moveUp: (idx: number) => void;
+  moveDown: (idx: number) => void;
+  isFirst: boolean;
+  isLast: boolean;
 };
 
 const AlgorithmBlock = (props: AlgorithmBlockProps) => {

@@ -11,6 +11,10 @@ type MedianBlurBlockProps = {
     updates: Partial<ConversionAlgorithm>
   ) => void;
   removeAlgorithm: (index: number) => void;
+  moveUp: (idx: number) => void;
+  moveDown: (idx: number) => void;
+  isFirst: boolean;
+  isLast: boolean;
 };
 
 const MedianBlurBlock = ({
@@ -19,6 +23,10 @@ const MedianBlurBlock = ({
   setEnabled,
   removeAlgorithm,
   updateAlgorithm,
+  moveUp,
+  moveDown,
+  isFirst,
+  isLast,
 }: MedianBlurBlockProps) => (
   <div className="relative flex w-full flex-col border rounded p-3 mb-1">
     <AlgorithmBlockHeader
@@ -26,6 +34,10 @@ const MedianBlurBlock = ({
       algorithm={algorithm}
       setEnabled={setEnabled}
       removeAlgorithm={removeAlgorithm}
+      moveUp={moveUp}
+      moveDown={moveDown}
+      isFirst={isFirst}
+      isLast={isLast}
     />
     <div className="flex gap-4 mt-2">
       <label>
