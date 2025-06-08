@@ -20,7 +20,7 @@ const convert = (
   bytesToProcess: Uint8Array<ArrayBufferLike>,
   algorithm: ConversionAlgorithm,
   setErrorMessage: (msg: string) => void
-) => {
+): Uint8Array<ArrayBufferLike> | undefined => {
   switch (algorithm.type) {
     case ConversionAlgorithmType.Grayscale:
       return to_grayscale(bytesToProcess);
@@ -37,7 +37,10 @@ const convert = (
     case ConversionAlgorithmType.MedianBlur:
       return median_blur(bytesToProcess, algorithm.kernelRadius);
     default:
-      setErrorMessage(`Unsupported algorithm: ${algorithm}`);
+      // fallback for unsupported algorithms
+      // This should ideally never happen if the algorithm list is properly managed
+      // That is why we use `as any` to avoid TypeScript errors
+      setErrorMessage(`Unsupported algorithm: ${(algorithm as any).type}`);
       return;
   }
 };
