@@ -1,4 +1,5 @@
 use image::{DynamicImage, ImageBuffer, ImageError, ImageOutputFormat, Rgb};
+use imageproc::filter::median_filter;
 use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 
@@ -41,7 +42,9 @@ pub fn clip_pixels_with_percentiles(
 
     if let (Some(lp), Some(hp)) = (low_percentile, high_percentile) {
         if lp > hp {
-            return Err(JsValue::from_str("low_percentile must be <= high_percentile"));
+            return Err(JsValue::from_str(
+                "low_percentile must be <= high_percentile",
+            ));
         }
     }
 
@@ -82,9 +85,8 @@ pub fn clip_pixels_with_percentiles(
         }
     });
 
-    let clip_buf: ImageBuffer<Rgb<u8>, Vec<u8>> =
-        ImageBuffer::from_raw(width, height, pixels)
-            .ok_or_else(|| JsValue::from_str("Buffer length mismatch after clipping"))?;
+    let clip_buf: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::from_raw(width, height, pixels)
+        .ok_or_else(|| JsValue::from_str("Buffer length mismatch after clipping"))?;
     let dyn_img = DynamicImage::ImageRgb8(clip_buf);
 
     let mut output = Cursor::new(Vec::new());
@@ -98,7 +100,13 @@ pub fn clip_pixels_with_percentiles(
 
 fn percentile_cutoff(flat_pixels: &mut [u8], pct: Option<f32>) -> Option<u8> {
     if let Some(p) = pct {
-        let p = if p < 0.0 { 0.0 } else if p > 100.0 { 100.0 } else { p };
+        let p = if p < 0.0 {
+            0.0
+        } else if p > 100.0 {
+            100.0
+        } else {
+            p
+        };
 
         let total = flat_pixels.len();
         if total == 0 {
@@ -128,6 +136,45 @@ fn read_and_encode(
 
     let mut buf = Cursor::new(Vec::new());
     img.write_to(&mut buf, ImageOutputFormat::Png).unwrap();
+
+    Ok(buf.into_inner())
+}
+
+#[wasm_bindgen]
+pub fn gaussian_blur(image: &[u8], sigma: f32) -> Result<Vec<u8>, JsValue> {
+    if sigma <= 0.0 {
+        return Err(JsValue::from_str("Sigma must be positive"));
+    }
+
+    let img = image::load_from_memory(image)
+        .map_err(|e| JsValue::from_str(&format!("Image decode error: {}", e)))?;
+
+    let blurred = img.blur(sigma);
+
+    let mut buf = Cursor::new(Vec::new());
+    blurred
+        .write_to(&mut buf, ImageOutputFormat::Png)
+        .map_err(|e| JsValue::from_str(&format!("PNG encode error: {}", e)))?;
+
+    Ok(buf.into_inner())
+}
+
+#[wasm_bindgen]
+pub fn median_blur(image: &[u8], kernel_radius: u32) -> Result<Vec<u8>, JsValue> {
+    if kernel_radius == 0 {
+        return Err(JsValue::from_str("Kernel radius must be positive"));
+    }
+
+    let img = image::load_from_memory(image)
+        .map_err(|e| JsValue::from_str(&format!("Image decode error: {}", e)))?;
+    let rgb = img.to_rgb8();
+
+    let filtered = median_filter(&rgb, kernel_radius, kernel_radius);
+
+    let mut buf = Cursor::new(Vec::new());
+    DynamicImage::ImageRgb8(filtered)
+        .write_to(&mut buf, ImageOutputFormat::Png)
+        .map_err(|e| JsValue::from_str(&format!("PNG encode error: {}", e)))?;
 
     Ok(buf.into_inner())
 }
