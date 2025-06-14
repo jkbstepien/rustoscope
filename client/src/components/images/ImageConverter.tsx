@@ -75,6 +75,8 @@ const ImageConverter = () => {
   
   const prevSrcUrlRef = useRef<string | null>(null);
   const prevResultUrlRef = useRef<string | null>(null);
+  const YIELD_DELAY_MS = 10;
+  const FINAL_DISPLAY_DELAY_MS = 500;
 
   const cleanupBlobUrls = () => {
     if (prevSrcUrlRef.current) {
