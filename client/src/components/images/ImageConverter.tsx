@@ -181,7 +181,7 @@ const ImageConverter = () => {
       setImgResult(finalUrl);
       setErrorMessage(undefined);
       
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, FINAL_DISPLAY_DELAY_MS));
     } catch (error) {
       setErrorMessage(`Processing error: ${error}`);
     } finally {
