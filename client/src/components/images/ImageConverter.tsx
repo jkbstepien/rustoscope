@@ -183,7 +183,11 @@ const ImageConverter = () => {
       
       await new Promise(resolve => setTimeout(resolve, FINAL_DISPLAY_DELAY_MS));
     } catch (error) {
-      setErrorMessage(`Processing error: ${error}`);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : JSON.stringify(error);
+      setErrorMessage(`Processing error: ${errorMessage}`);
     } finally {
       setIsProcessing(false);
       setProcessingProgress(0);
