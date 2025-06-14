@@ -165,7 +165,7 @@ const ImageConverter = () => {
         prevResultUrlRef.current = newUrl;
         setImgResult(newUrl);
         
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise(resolve => setTimeout(resolve, YIELD_DELAY_MS));
       }
 
       setProcessingProgress(100);
