@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useState, useRef, useEffect } from 'preact/hooks';
 import { useWasm } from '@/hooks/useWasm';
 import {
   to_grayscale,
@@ -13,6 +13,7 @@ import AlgorithmsContainer from '@/components/algorithms/AlgorithmsContainer';
 import {
   ConversionAlgorithm,
   ConversionAlgorithmType,
+  getAlgorithmName,
 } from '@/models/algorithms';
 import { TargetedEvent } from 'preact/compat';
 
@@ -68,6 +69,31 @@ const ImageConverter = () => {
   const [previewsAspectRatios, setPreviewsAspectRatios] = useState(16 / 10);
 
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [currentAlgorithm, setCurrentAlgorithm] = useState<string>('');
+  
+  const prevSrcUrlRef = useRef<string | null>(null);
+  const prevResultUrlRef = useRef<string | null>(null);
+  const YIELD_DELAY_MS = 10;
+  const FINAL_DISPLAY_DELAY_MS = 500;
+
+  const cleanupBlobUrls = () => {
+    if (prevSrcUrlRef.current) {
+      URL.revokeObjectURL(prevSrcUrlRef.current);
+      prevSrcUrlRef.current = null;
+    }
+    if (prevResultUrlRef.current) {
+      URL.revokeObjectURL(prevResultUrlRef.current);
+      prevResultUrlRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      cleanupBlobUrls();
+    };
+  }, []);
 
   const handleUpload = async (e: TargetedEvent<HTMLInputElement, Event>) => {
     const file = e.currentTarget.files?.[0];
@@ -81,8 +107,21 @@ const ImageConverter = () => {
     try {
       const processedBytes = processBytes(file.type, bytes);
       setRawBytes(processedBytes);
+      
+      if (prevSrcUrlRef.current) {
+        URL.revokeObjectURL(prevSrcUrlRef.current);
+      }
+      
       const blob = new Blob([processedBytes]);
-      setImgSrc(URL.createObjectURL(blob));
+      const newUrl = URL.createObjectURL(blob);
+      prevSrcUrlRef.current = newUrl;
+      setImgSrc(newUrl);
+      
+      if (prevResultUrlRef.current) {
+        URL.revokeObjectURL(prevResultUrlRef.current);
+        prevResultUrlRef.current = null;
+        setImgResult(null);
+      }
     } catch (err) {
       setErrorMessage(`Upload error: ${err}`);
       setImgSrc(null);
@@ -90,28 +129,72 @@ const ImageConverter = () => {
     }
   };
 
-  const handleRun = () => {
+  const handleRun = async () => {
     const enabledAlgorithms = algorithms.filter((a) => a.enabled);
     if (!rawBytes || !wasmReady) return;
     if (enabledAlgorithms.length === 0) {
       setErrorMessage('No algorithms selected');
       return;
     }
+    
     setErrorMessage(undefined);
+    setIsProcessing(true);
+    setProcessingProgress(0);
+    setCurrentAlgorithm('');
 
-    let processedBytes: Uint8Array<ArrayBufferLike> | undefined =
-      Uint8Array.from(rawBytes);
-    for (const algorithm of enabledAlgorithms) {
-      processedBytes = convert(processedBytes, algorithm, setErrorMessage);
-      if (!processedBytes) {
-        console.error(`Conversion failed for algorithm: ${algorithm.type}`);
-        return;
+    try {
+      let processedBytes: Uint8Array<ArrayBufferLike> | undefined =
+        Uint8Array.from(rawBytes);
+      
+      for (let i = 0; i < enabledAlgorithms.length; i++) {
+        const algorithm = enabledAlgorithms[i];
+        
+        setCurrentAlgorithm(getAlgorithmName(algorithm.type));
+        setProcessingProgress(Math.round((i / enabledAlgorithms.length) * 100));
+              
+        processedBytes = convert(processedBytes, algorithm, setErrorMessage);
+        if (!processedBytes) {
+          console.error(`Conversion failed for algorithm: ${algorithm.type}`);
+          return;
+        }
+        
+        if (prevResultUrlRef.current) {
+          URL.revokeObjectURL(prevResultUrlRef.current);
+        }
+        
+        const intermediateBlob = new Blob([processedBytes], { type: 'image/png' });
+        const newUrl = URL.createObjectURL(intermediateBlob);
+        prevResultUrlRef.current = newUrl;
+        setImgResult(newUrl);
+        
+        await new Promise(resolve => setTimeout(resolve, YIELD_DELAY_MS));
       }
-    }
 
-    const blob = new Blob([processedBytes], { type: 'image/png' });
-    setImgResult(URL.createObjectURL(blob));
-    setErrorMessage(undefined);
+      setProcessingProgress(100);
+      setCurrentAlgorithm('Complete');
+      
+      if (prevResultUrlRef.current) {
+        URL.revokeObjectURL(prevResultUrlRef.current);
+      }
+      
+      const finalBlob = new Blob([processedBytes], { type: 'image/png' });
+      const finalUrl = URL.createObjectURL(finalBlob);
+      prevResultUrlRef.current = finalUrl;
+      setImgResult(finalUrl);
+      setErrorMessage(undefined);
+      
+      await new Promise(resolve => setTimeout(resolve, FINAL_DISPLAY_DELAY_MS));
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : JSON.stringify(error);
+      setErrorMessage(`Processing error: ${errorMessage}`);
+    } finally {
+      setIsProcessing(false);
+      setProcessingProgress(0);
+      setCurrentAlgorithm('');
+    }
   };
 
   return (
@@ -131,7 +214,7 @@ const ImageConverter = () => {
             error={errorMessage}
           />
         </div>
-        <div className="w-full flex items-start justify-center mt-10 rounded-md">
+        <div className="w-full flex items-start justify-center mt-10 rounded-md relative">
           <ImagePreview
             imageUrl={imgResult}
             header={'Converted Image'}
@@ -143,6 +226,26 @@ const ImageConverter = () => {
                 : 'No image selected'
             }
           />
+          
+          {/* Progress Indicator */}
+          {isProcessing && (
+            <div className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-white rounded-lg px-4 py-2 shadow-md z-10">
+              <div className="text-center">
+                <div className="text-xs font-medium text-gray-700 mb-1">
+                  {currentAlgorithm || 'Processing...'}
+                </div>
+                <div className="w-32 bg-gray-200 rounded-full h-1">
+                  <div 
+                    className="bg-green-500 h-1 rounded-full transition-all duration-300"
+                    style={{ width: `${processingProgress}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {processingProgress}%
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="w-1/4 flex-col h-full bg-gray-50 mt-2 ml-1 rounded-md p-3 shadow-md">
@@ -162,10 +265,15 @@ const ImageConverter = () => {
           />
           <button
             type="button"
-            className="cursor-pointer text-center flex items-center justify-center px-4 py-2 rounded-md h-[30px] w-[135px] bg-green-600 text-white transition-colors hover:bg-green-700"
+            className={`cursor-pointer text-center flex items-center justify-center px-4 py-2 rounded-md h-[30px] w-[135px] text-white transition-colors ${
+              isProcessing 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-green-600 hover:bg-green-700'
+            }`}
             onClick={handleRun}
+            disabled={isProcessing}
           >
-            Run
+            {isProcessing ? 'Processing...' : 'Run'}
           </button>
         </div>
 
